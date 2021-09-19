@@ -10,13 +10,13 @@ namespace GlacBot
     class Program
     {
         public static DiscordSocketClient client;
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Starting GlacBot...");
+
+		public async Task MainAsync() {
+			Console.WriteLine("Starting GlacBot...");
             client = new DiscordSocketClient();
 
-            client.LoginAsync(TokenType.Bot, File.ReadAllText("token.txt"));
-            client.StartAsync();
+            await client.LoginAsync(TokenType.Bot, File.ReadAllText("token.txt"));
+            await client.StartAsync();
 
             client.MessageReceived += MessageReceived;
             Console.WriteLine("GlacBot started!");
@@ -30,9 +30,10 @@ namespace GlacBot
                 }
             }
 
-            client.LogoutAsync();
+            await client.LogoutAsync();
             client.Dispose();
-        }
+		}
+        static void Main(string[] args) => new Program().MainAsync().GetAwaiter().GetResult();
 
         static string command = "glacify";
         public static async Task MessageReceived(SocketMessage message)
