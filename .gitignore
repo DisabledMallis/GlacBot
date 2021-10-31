@@ -4,3 +4,7 @@ bin/
 obj/
 token.txt
 *.png
+
+# Added by cargo
+
+/target
