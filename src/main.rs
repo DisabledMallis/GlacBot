@@ -1,15 +1,15 @@
-use std::{borrow::Borrow, env, io::Cursor};
+use std::{env, io::Cursor};
 use anyhow::Result;
 use dotenv;
 use futures::StreamExt;
-use imageproc::{drawing::{Canvas, draw_cross, draw_cross_mut, draw_text, draw_hollow_circle_mut, draw_line_segment, draw_line_segment_mut}, rgb_image};
+use imageproc::{drawing::draw_line_segment_mut};
 use reqwest;
 use tokio::task;
 // use regex::Regex;
 use twilight_gateway::{cluster::ShardScheme, Cluster, Event, Intents};
 use serde::{Serialize,Deserialize};
 use twilight_http::Client;
-use image::{DynamicImage, GenericImage, GenericImageView, ImageBuffer, ImageDecoder, ImageOutputFormat, Pixel, Rgb, RgbImage, Rgba, io::Reader};
+use image::{ImageOutputFormat, Rgba, io::Reader};
 
 #[derive(Debug)]
 pub enum CustomError {
