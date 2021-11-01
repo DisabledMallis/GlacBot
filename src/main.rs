@@ -2,14 +2,80 @@ use std::{borrow::Borrow, env, io::Cursor};
 use anyhow::Result;
 use dotenv;
 use futures::StreamExt;
-use imageproc::{drawing::{Canvas, draw_cross, draw_cross_mut, draw_text, draw_hollow_circle_mut}, rgb_image};
+use imageproc::{drawing::{Canvas, draw_cross, draw_cross_mut, draw_text, draw_hollow_circle_mut, draw_line_segment, draw_line_segment_mut}, rgb_image};
 use reqwest;
 use tokio::task;
 // use regex::Regex;
 use twilight_gateway::{cluster::ShardScheme, Cluster, Event, Intents};
+use serde::{Serialize,Deserialize};
 use twilight_http::Client;
-use image::{DynamicImage, GenericImage, GenericImageView, ImageBuffer, ImageDecoder, ImageOutputFormat, Pixel, Rgb, RgbImage, Rgba};
+use image::{DynamicImage, GenericImage, GenericImageView, ImageBuffer, ImageDecoder, ImageOutputFormat, Pixel, Rgb, RgbImage, Rgba, io::Reader};
 
+#[derive(Debug)]
+pub enum CustomError {
+    RequestError(reqwest::Error),
+    CopyError,
+    OtherError
+}
+
+async fn download_user_skin<'a>(user_id: String) -> Result<Vec<u8>,CustomError> {
+    let user_id = format!("https://crafatar.com/skins/{}",user_id);
+    let user_skin = reqwest::get(user_id).await.map_err(|e| CustomError::RequestError(e))?;
+
+    let mut bytes = Cursor::new(user_skin.bytes().await.map_err(|_| CustomError::OtherError)?);
+    let mut writer: Vec<u8> = vec![];
+    std::io::copy(&mut bytes, &mut writer).map_err(|_| CustomError::CopyError)?;
+
+    Ok(writer)
+}
+
+fn download_skin<'a>(bytes: &'a Vec<u8>) -> Reader<Cursor<&'a Vec<u8>>> {
+    image::io::Reader::with_format(Cursor::new(bytes), image::ImageFormat::Png)
+}
+
+#[derive(Serialize,Deserialize,Debug,Clone)]
+pub struct NameChange {
+    name: String,
+    #[serde(rename="changedToAt")]
+    changed_to_at: Option<usize>
+}
+
+#[derive(Serialize,Deserialize,Debug,Clone)]
+pub struct PlayerMeta {
+    pub name_history: Vec<NameChange>
+}
+
+#[derive(Serialize,Deserialize,Debug,Clone)]
+pub struct PlayerInfo {
+    pub meta: PlayerMeta,
+    pub username: String,
+    pub id: String,
+    pub raw_id: String,
+    pub avatar: String,
+}
+
+#[derive(Serialize,Deserialize,Debug,Clone)]
+pub struct RequestUserData {
+    pub player: PlayerInfo
+}
+
+#[derive(Serialize,Deserialize,Debug,Clone)]
+pub struct UserInfoRequest {
+  pub code: String,
+  pub message: String,
+  pub success: bool,
+  pub data: RequestUserData
+}  
+
+// fn apply_glacses<C>(canvas: C, color: Rgba<i32>) -> C
+//     where C: Canvas {
+        
+//         draw_line_segment_mut(&mut canvas, (37 as f32,11 as f32), (50 as f32,11 as f32), Rgba([0,0,0,100]));
+//         draw_line_segment_mut(&mut canvas, (41 as f32,12 as f32), (42 as f32,12 as f32), Rgba([0,0,0,100]));
+//         draw_line_segment_mut(&mut canvas, (45 as f32,12 as f32), (46 as f32,12 as f32), Rgba([0,0,0,100]));
+
+//         canvas
+//     }
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -54,8 +120,19 @@ async fn main() -> Result<()> {
                                 let file = match reqwest::get(&attachment.url).await {
                                     Ok(res) => {
                                         let mut bytes = Cursor::new(res.bytes().await?);
-                                        let mut writer: Vec<u8> = vec![];
-                                        std::io::copy(&mut bytes, &mut writer)?;
+                                        let mut writer: Vec<u8> = vec![
+                                            
+                                        ];
+                                        match std::io::copy(&mut bytes, &mut writer) {
+                                            Ok(_) => {},
+                                            Err(_) => {
+                                                http.create_message(msg.channel_id)
+                                                .content(":x:")?
+                                                .exec()
+                                                .await?;
+                                                break;
+                                            },
+                                        }
 
                                         writer
                                     }
@@ -68,37 +145,77 @@ async fn main() -> Result<()> {
                                     }
                                 };
     
-                                http.create_message(msg.channel_id)
-                                    .content(":warning: Now doing stuff!")?
-                                    .exec()
-                                    .await?; 
-                                
-                                let image = image::io::Reader::with_format(Cursor::new(&file), image::ImageFormat::Png);
+                                let image = download_skin(&file);
 
                                 let mut image = match image.decode() {
                                     Ok(image) => image,
                                     Err(_err) => {
                                         http.create_message(msg.channel_id)
-                                        .content("Something happened while decoding provided image. Try a different one?")?
+                                        .content(":x:")?
                                         .exec()
                                         .await?; 
                                         break;                                                 
                                     }
                                 };
 
-                                draw_hollow_circle_mut(&mut image,  (100, 100), 15, Rgba([255, 255, 255, 255]),);
+                                draw_line_segment_mut(&mut image, (37 as f32,11 as f32), (50 as f32,11 as f32), Rgba([0,0,0,100]));
+                                draw_line_segment_mut(&mut image, (41 as f32,12 as f32), (42 as f32,12 as f32), Rgba([0,0,0,100]));
+                                draw_line_segment_mut(&mut image, (45 as f32,12 as f32), (46 as f32,12 as f32), Rgba([0,0,0,100]));
+
 
                                 let mut new_image = vec![];
                                 image.write_to(&mut new_image, ImageOutputFormat::Png).unwrap();
 
                                 http.create_message(msg.channel_id)
-                                    .files(&[("name.png", &new_image)])
-                                    .content("done")?
+                                    .files(&[(attachment.filename.as_str(), &new_image)])
                                     .exec()
                                     .await?; 
     
                             }
-                        }        
+                        } else if let Some(mc_name) = msg.content.split(" ").nth(1) {
+                            http.create_message(msg.channel_id)
+                                .content(&format!("glacifying {}", mc_name))?
+                                .exec()
+                                .await?;
+
+                            let data = reqwest::get(format!("https://playerdb.co/api/player/minecraft/{}",mc_name)).await?;
+
+                            if let Ok(user_data) = data.json::<UserInfoRequest>().await {
+                                let user_id = user_data.data.player.id.clone();
+
+                                http.create_message(msg.channel_id)
+                                    .content(&format!("Got uuid: {}", user_id))?
+                                    .exec()
+                                    .await?;
+
+                                let user_skin = download_user_skin(user_id).await.unwrap();
+                                let image = download_skin(&user_skin);
+
+                                let mut image = match image.decode() {
+                                    Ok(image) => image,
+                                    Err(_err) => {
+                                        http.create_message(msg.channel_id)
+                                        .content(":x:")?
+                                        .exec()
+                                        .await?; 
+                                        break;                                                 
+                                    }
+                                };
+
+                                draw_line_segment_mut(&mut image, (37 as f32,11 as f32), (50 as f32,11 as f32), Rgba([0,0,0,100]));
+                                draw_line_segment_mut(&mut image, (41 as f32,12 as f32), (42 as f32,12 as f32), Rgba([0,0,0,100]));
+                                draw_line_segment_mut(&mut image, (45 as f32,12 as f32), (46 as f32,12 as f32), Rgba([0,0,0,100]));
+
+
+                                let mut new_image = vec![];
+                                image.write_to(&mut new_image, ImageOutputFormat::Png).unwrap();
+
+                                http.create_message(msg.channel_id)
+                                    .files(&[(&format!("{}-modified.png", user_data.data.player.username), &new_image)])
+                                    .exec()
+                                    .await?;
+                            }
+                        }      
                     }           
                 }
             }
