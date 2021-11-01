@@ -18,7 +18,7 @@ pub enum CustomError {
     OtherError
 }
 
-async fn download_user_skin<'a>(user_id: String) -> Result<Vec<u8>,CustomError> {
+async fn download_user_skin(user_id: String) -> Result<Vec<u8>,CustomError> {
     let user_id = format!("https://crafatar.com/skins/{}",user_id);
     let user_skin = reqwest::get(user_id).await.map_err(|e| CustomError::RequestError(e))?;
 
