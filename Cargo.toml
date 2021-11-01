@@ -1,0 +1,21 @@
+[package]
+name = "glac_bot"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.43"
+dotenv = "0.15.0"
+twilight-gateway = "0.6.3"
+twilight-http = "0.6.5"
+serde = { version = "1.0.123", features = ["derive"] }
+serde_ignored = "0.1.0"
+serde_json = { version = "1.0.30", features = ["raw_value"] }
+tokio = { version = "1.11.0", features = [ "rt", "rt-multi-thread", "macros",  ] }
+futures = "0.3.17"
+reqwest = { version = "0.11", default-features = false, features = ["json", "rustls-tls"] }
+regex = "1"
+imageproc = "0.22.0"
+image = "0.23.14"
