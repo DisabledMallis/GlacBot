@@ -67,16 +67,6 @@ pub struct UserInfoRequest {
   pub data: RequestUserData
 }  
 
-// fn apply_glacses<C>(canvas: C, color: Rgba<i32>) -> C
-//     where C: Canvas {
-        
-//         draw_line_segment_mut(&mut canvas, (37 as f32,11 as f32), (50 as f32,11 as f32), Rgba([0,0,0,100]));
-//         draw_line_segment_mut(&mut canvas, (41 as f32,12 as f32), (42 as f32,12 as f32), Rgba([0,0,0,100]));
-//         draw_line_segment_mut(&mut canvas, (45 as f32,12 as f32), (46 as f32,12 as f32), Rgba([0,0,0,100]));
-
-//         canvas
-//     }
-
 #[tokio::main]
 async fn main() -> Result<()> {
     dotenv::from_filename(".env").ok();
