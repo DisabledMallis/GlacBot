@@ -135,19 +135,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
-name = "chrono"
-version = "0.4.19"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "670ad68c9088c2a963aaa298cb369688cf3f9465ce5e2d4ca10e6e0098a1ce73"
-dependencies = [
- "libc",
- "num-integer",
- "num-traits",
- "time",
- "winapi",
-]
-
-[[package]]
 name = "color_quant"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -254,16 +241,6 @@ name = "custom_derive"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ef8ae57c4978a2acd8b869ce6b9ca1dfe817bff704c220209fdef2c0b75a01b9"
-
-[[package]]
-name = "dashmap"
-version = "4.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e77a43b28d0668df09411cb0bc9a8c2adc40f9a048afe863e05fd43251e8e39c"
-dependencies = [
- "cfg-if",
- "num_cpus",
-]
 
 [[package]]
 name = "deflate"
@@ -475,7 +452,6 @@ name = "glac_bot"
 version = "0.1.0"
 dependencies = [
  "anyhow",
- "chrono",
  "dotenv",
  "futures",
  "image",
@@ -486,13 +462,8 @@ dependencies = [
  "serde_ignored",
  "serde_json",
  "tokio",
- "twilight-cache-inmemory",
- "twilight-command-parser",
- "twilight-embed-builder",
  "twilight-gateway",
  "twilight-http",
- "twilight-model",
- "twilight-util",
 ]
 
 [[package]]
@@ -1498,16 +1469,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "time"
-version = "0.1.43"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ca8a50ef2360fbd1eeb0ecd46795a87a19024eb4b53c5dc916ca1fd95fe62438"
-dependencies = [
- "libc",
- "winapi",
-]
-
-[[package]]
 name = "tinyvec"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1666,36 +1627,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "twilight-cache-inmemory"
-version = "0.6.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ac0cd25d0a7ddeade9bcb2065d67cba1611b631c9d3db794005cb73e7eac74a2"
-dependencies = [
- "bitflags",
- "dashmap",
- "serde",
- "twilight-model",
-]
-
-[[package]]
-name = "twilight-command-parser"
-version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5d2f37b25ae1102b2dac04a84db0416a3f38dfdeab4985e630bc27d3f911d40f"
-dependencies = [
- "unicase",
-]
-
-[[package]]
-name = "twilight-embed-builder"
-version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a13105b773175a704f8dd2c6c3c8a07476426d61b51d5e69d9d2eb5878f2ec93"
-dependencies = [
- "twilight-model",
-]
-
-[[package]]
 name = "twilight-gateway"
 version = "0.6.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1758,28 +1689,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "twilight-util"
-version = "0.6.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ed5820a5c1bef7843ce6cda4d5ee40ac686625572be050b1456b42c110aef73c"
-dependencies = [
- "twilight-model",
-]
-
-[[package]]
 name = "typenum"
 version = "1.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b63708a265f51345575b27fe43f9500ad611579e764c79edbc2037b1121959ec"
-
-[[package]]
-name = "unicase"
-version = "2.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "50f37be617794602aabbeee0be4f259dc1778fabe05e2d67ee8f79326d5cb4f6"
-dependencies = [
- "version_check",
-]
 
 [[package]]
 name = "unicode-bidi"
